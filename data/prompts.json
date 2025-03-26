@@ -1,0 +1,9 @@
+{
+    "prompts": [
+    "Generate 5 user stories.",
+    "Generate 5 user stories with acceptance criteria.",
+    "Generate 10 user stories.",
+    "Generate 10 user stories with acceptance criteria.",
+    "Generate 10 user stories with acceptance criteria and tasks."
+]
+}
