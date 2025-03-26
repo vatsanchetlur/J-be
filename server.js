@@ -86,3 +86,61 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
+
+const axios = require('axios');
+
+// ✅ Create Epic and Stories in JIRA
+app.post('/api/jira/create', async (req, res) => {
+  const { epic, stories, projectKey, jiraLabel, jiraUser } = req.body;
+
+  if (!epic || !stories || !projectKey || !jiraLabel || !jiraUser) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  const JIRA_BASE_URL = process.env.JIRA_BASE_URL;
+  const JIRA_EMAIL = process.env.JIRA_EMAIL;
+  const JIRA_API_TOKEN = process.env.JIRA_API_TOKEN;
+
+  const auth = Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64');
+  const headers = {
+    'Authorization': `Basic ${auth}`,
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  };
+
+  try {
+    // Create Epic
+    const epicRes = await axios.post(`${JIRA_BASE_URL}/rest/api/3/issue`, {
+      fields: {
+        project: { key: projectKey },
+        summary: epic.summary,
+        description: epic.description,
+        issuetype: { name: "Epic" },
+        labels: [jiraLabel],
+        customfield_10011: epic.summary // Epic Name (update if your JIRA instance uses different field)
+      }
+    }, { headers });
+
+    const epicKey = epicRes.data.key;
+
+    // Create Stories
+    for (const story of stories) {
+      const storyPayload = {
+        fields: {
+          project: { key: projectKey },
+          summary: story.summary,
+          description: story.description,
+          issuetype: { name: "Story" },
+          labels: [jiraLabel],
+          parent: { key: epicKey }
+        }
+      };
+      await axios.post(`${JIRA_BASE_URL}/rest/api/3/issue`, storyPayload, { headers });
+    }
+
+    res.status(200).json({ message: 'Created in JIRA', epicKey });
+  } catch (err) {
+    console.error('Error creating in JIRA:', err.response?.data || err.message);
+    res.status(500).json({ error: 'Failed to create in JIRA' });
+  }
+});
