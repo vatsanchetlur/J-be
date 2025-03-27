@@ -15,11 +15,8 @@ const JIRA_BASE_URL = process.env.JIRA_BASE_URL;
 const JIRA_EMAIL = process.env.JIRA_EMAIL;
 const JIRA_API_TOKEN = process.env.JIRA_API_TOKEN;
 
-// ✅ CORS - Only allow frontend GitHub Pages domain
-app.use(cors({
-  origin: 'https://vatsanchetlur.github.io',
-}));
-
+// ✅ CORS - Allow all origins for proxy route
+app.use(cors());
 app.use(express.json());
 
 // ✅ Test route
@@ -29,7 +26,25 @@ app.get('/api/test', (req, res) => {
 
 // ✅ JIRA Create Test Route
 app.get('/api/jira/test', (req, res) => {
-  res.json({ message: `JIRA Create route working! ✅ Base URL: 'https://libertymutual.atlassian.net/rest/api/3/issue` });
+  res.json({ message: `JIRA Create route working! ✅ Base URL: ${JIRA_BASE_URL}` });
+});
+
+// ✅ Proxy route to handle CORS
+app.use('/proxy', async (req, res) => {
+  try {
+    const response = await axios({
+      method: req.method,
+      url: `${JIRA_BASE_URL}${req.path}`,
+      headers: {
+        'Authorization': req.headers['authorization'],
+        'Content-Type': req.headers['content-type']
+      },
+      data: req.body
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(error.response.status).json(error.response.data);
+  }
 });
 
 // ✅ Prompt Library route
@@ -108,7 +123,7 @@ app.post('/api/jira/create', async (req, res) => {
 
   try {
     // Create Epic
-    const epicRes = await axios.post(`https://libertymutual.atlassian.net/rest/api/3/issue`, {
+    const epicRes = await axios.post(`${JIRA_BASE_URL}/rest/api/3/issue`, {
       fields: {
         project: { key: projectKey },
         summary: epic.summary,
@@ -161,7 +176,7 @@ app.post('/api/jira/create', async (req, res) => {
           parent: { key: epicKey }
         }
       };
-      await axios.post(`https://libertymutual.atlassian.net/rest/api/3/issue`, storyPayload, { headers });
+      await axios.post(`${JIRA_BASE_URL}/rest/api/3/issue`, storyPayload, { headers });
     }
 
     res.status(200).json({ message: 'Created in JIRA', epicKey });
