@@ -11,6 +11,10 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+const JIRA_BASE_URL = process.env.JIRA_BASE_URL;
+const JIRA_EMAIL = process.env.JIRA_EMAIL;
+const JIRA_API_TOKEN = process.env.JIRA_API_TOKEN;
+
 // ✅ CORS - Only allow frontend GitHub Pages domain
 app.use(cors({
   origin: 'https://vatsanchetlur.github.io',
@@ -23,8 +27,9 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'Test route working! ✅' });
 });
 
-app.get(`${JIRA_BASE_URL}/rest/api/3/issue`, (req, res) => {
-  res.json({ message: 'JIRA Create route working! ✅' });
+// ✅ JIRA Create Test Route
+app.get('/api/jira/test', (req, res) => {
+  res.json({ message: `JIRA Create route working! ✅ Base URL: ${JIRA_BASE_URL}` });
 });
 
 // ✅ Prompt Library route
@@ -87,16 +92,12 @@ app.post('/api/generate-upload', async (req, res) => {
 });
 
 // ✅ Create Epic and Stories in JIRA
-app.post(`${JIRA_BASE_URL}/rest/api/3/issue`, async (req, res) => {
+app.post('/api/jira/create', async (req, res) => {
   const { epic, stories, projectKey, jiraLabel, jiraUser } = req.body;
 
   if (!epic || !stories || !projectKey || !jiraLabel || !jiraUser) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
-
-  const JIRA_BASE_URL = process.env.JIRA_BASE_URL;
-  const JIRA_EMAIL = process.env.JIRA_EMAIL;
-  const JIRA_API_TOKEN = process.env.JIRA_API_TOKEN;
 
   const auth = Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64');
   const headers = {
