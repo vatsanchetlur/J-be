@@ -1,9 +1,12 @@
 {
     "prompts": [
-    "Generate 5 user stories.",
-    "Generate 5 user stories with acceptance criteria.",
-    "Generate 10 user stories.",
-    "Generate 10 user stories with acceptance criteria.",
-    "Generate 10 user stories with acceptance criteria and tasks."
+    "Break down this use case into one Epic and several detailed User Stories..",
+    "Generate an Epic and related User Stories with clear acceptance criteria.",
+    "Create a well-defined Epic and multiple User Stories.",
+    "Turn the use case below into an Epic and 3–5 related User Stories for Agile development",
+    "Generate an Epic, plus User Stories with tasks and acceptance criteria.",
+    "Extract the high-level Epic and break it into actionable User Stories",
+    "Write an Epic and related User Stories that follow Agile best practices"
+
 ]
 }
