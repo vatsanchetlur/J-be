@@ -161,7 +161,7 @@ app.post('/api/jira/create', async (req, res) => {
           parent: { key: epicKey }
         }
       };
-      await axios.post(`${JIRA_BASE_URL}/rest/api/3/issue`, storyPayload, { headers });
+      await axios.post(`https://libertymutual.atlassian.net/rest/api/3/issue`, storyPayload, { headers });
     }
 
     res.status(200).json({ message: 'Created in JIRA', epicKey });
