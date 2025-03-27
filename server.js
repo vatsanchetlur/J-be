@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const axios = require('axios');
 const app = express();
 const prompts = require('./data/prompts.json'); // Ensure this file exists
 
@@ -81,20 +82,12 @@ app.post('/api/generate-upload', async (req, res) => {
   }
 });
 
-// ✅ Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
-
-const axios = require('axios');
-
 // ✅ Create Epic and Stories in JIRA
 app.post('/api/jira/create', async (req, res) => {
   const { epic, stories, projectKey, jiraLabel, jiraUser } = req.body;
 
   if (!epic || !stories || !projectKey || !jiraLabel || !jiraUser) {
-    return res.status(400).json({ error: "Missing required fields" });
+    return res.status(400).json({ error: 'Missing required fields' });
   }
 
   const JIRA_BASE_URL = process.env.JIRA_BASE_URL;
@@ -114,7 +107,21 @@ app.post('/api/jira/create', async (req, res) => {
       fields: {
         project: { key: projectKey },
         summary: epic.summary,
-        description: epic.description,
+        description: {
+          version: 1,
+          type: "doc",
+          content: [
+            {
+              type: "paragraph",
+              content: [
+                {
+                  type: "text",
+                  text: epic.description
+                }
+              ]
+            }
+          ]
+        },
         issuetype: { name: "Epic" },
         labels: [jiraLabel],
         customfield_10011: epic.summary // Epic Name (update if your JIRA instance uses different field)
@@ -129,7 +136,21 @@ app.post('/api/jira/create', async (req, res) => {
         fields: {
           project: { key: projectKey },
           summary: story.summary,
-          description: story.description,
+          description: {
+            version: 1,
+            type: "doc",
+            content: [
+              {
+                type: "paragraph",
+                content: [
+                  {
+                    type: "text",
+                    text: story.description
+                  }
+                ]
+              }
+            ]
+          },
           issuetype: { name: "Story" },
           labels: [jiraLabel],
           parent: { key: epicKey }
@@ -143,4 +164,10 @@ app.post('/api/jira/create', async (req, res) => {
     console.error('Error creating in JIRA:', err.response?.data || err.message);
     res.status(500).json({ error: 'Failed to create in JIRA' });
   }
+});
+
+// ✅ Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
