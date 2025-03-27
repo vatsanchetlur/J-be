@@ -29,7 +29,7 @@ app.get('/api/test', (req, res) => {
 
 // ✅ JIRA Create Test Route
 app.get('/api/jira/test', (req, res) => {
-  res.json({ message: `JIRA Create route working! ✅ Base URL: ${JIRA_BASE_URL}` });
+  res.json({ message: `JIRA Create route working! ✅ Base URL: 'https://libertymutual.atlassian.net/rest/api/3/issue` });
 });
 
 // ✅ Prompt Library route
@@ -108,7 +108,7 @@ app.post('/api/jira/create', async (req, res) => {
 
   try {
     // Create Epic
-    const epicRes = await axios.post(`${JIRA_BASE_URL}/rest/api/3/issue`, {
+    const epicRes = await axios.post(`https://libertymutual.atlassian.net/rest/api/3/issue`, {
       fields: {
         project: { key: projectKey },
         summary: epic.summary,
