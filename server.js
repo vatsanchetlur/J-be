@@ -23,7 +23,7 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'Test route working! ✅' });
 });
 
-app.get('/api/jira/create', (req, res) => {
+app.get(`${JIRA_BASE_URL}/rest/api/3/issue`, (req, res) => {
   res.json({ message: 'JIRA Create route working! ✅' });
 });
 
@@ -87,7 +87,7 @@ app.post('/api/generate-upload', async (req, res) => {
 });
 
 // ✅ Create Epic and Stories in JIRA
-app.post('/api/jira/create', async (req, res) => {
+app.post(`${JIRA_BASE_URL}/rest/api/3/issue`, async (req, res) => {
   const { epic, stories, projectKey, jiraLabel, jiraUser } = req.body;
 
   if (!epic || !stories || !projectKey || !jiraLabel || !jiraUser) {
