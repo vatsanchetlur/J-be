@@ -23,6 +23,10 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'Test route working! ✅' });
 });
 
+app.get('/api/jira/create', (req, res) => {
+  res.json({ message: 'JIRA Create route working! ✅' });
+});
+
 // ✅ Prompt Library route
 app.get('/api/prompts', (req, res) => {
   res.json(prompts);
